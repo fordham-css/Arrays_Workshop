@@ -1,0 +1,260 @@
+\documentclass[aspectratio=169]{beamer}
+\usepackage{hyperref}
+\usepackage{listings}
+
+% \usepackage{fontspec}
+% \setmonofont{Consolas}
+
+\definecolor{background}{RGB}{39, 40, 34}
+\definecolor{string}{RGB}{230, 219, 116}
+\definecolor{comment}{RGB}{117, 113, 94}
+\definecolor{normal}{RGB}{248, 248, 242}
+\definecolor{identifier}{RGB}{166, 226, 46}
+\definecolor{keyword}{HTML}{F92672}
+\definecolor{numbers}{HTML}{AE81FF}
+\definecolor{types}{HTML}{66D9EF}
+
+
+\lstset{
+    language=C,
+    tabsize=4, % tab space width
+    showstringspaces=false, % don't mark spaces in strings
+    numbers=left, % display line numbers on the left
+    basicstyle=\ttfamily,
+    numberstyle=\color{comment}\ttfamily, % Line numbers
+    commentstyle=\color{comment}\ttfamily, % comment color
+    otherkeywords={>,<,-,!,=,~}, % Color operators too
+    morekeywords={>,<,-,!,=,~},
+    keywordstyle=\color{keyword}\ttfamily, % keyword color
+    stringstyle=\color{string}\ttfamily, % string color
+    morecomment=[l][\color{keyword}]{\#},
+    emph={int,char,long,float,double,unsigned,namespace,typename},
+    emphstyle={\color{types}\ttfamily\textit},
+    escapeinside={@!}{!@},
+    captionpos=b
+}
+
+\newcommand{\code}{\texttt}
+\newcommand{\fn}{\color{identifier}}
+
+\usetheme{Warsaw}
+
+\addtobeamertemplate{footnote}{\vspace{-6pt}\advance\hsize-0.5cm}{\vspace{6pt}}
+\makeatletter
+% Alternative A: footnote rule
+\renewcommand*{\footnoterule}{\kern -3pt \hrule \@width 2in \kern 8.6pt}
+% Alternative B: no footnote rule
+% \renewcommand*{\footnoterule}{\kern 6pt}
+\makeatother
+
+\setbeamercolor{normal text}{fg=normal,bg=background}
+\setbeamercolor{structure}{fg=normal}
+
+\setbeamercolor{alerted text}{fg=red!85!black}
+
+\setbeamercolor{item projected}{use=item,fg=background,bg=item.fg!35}
+
+\setbeamercolor*{palette primary}{use=structure,fg=structure.fg}
+\setbeamercolor*{palette secondary}{use=structure,fg=structure.fg!95!black}
+\setbeamercolor*{palette tertiary}{use=structure,fg=structure.fg!90!black}
+\setbeamercolor*{palette quaternary}{use=structure,fg=structure.fg!95!black,bg=black!80}
+
+\setbeamercolor*{framesubtitle}{fg=normal}
+
+\setbeamercolor*{block title}{parent=structure,bg=background}
+\setbeamercolor*{block body}{fg=black,bg=background}
+\setbeamercolor*{block title alerted}{parent=alerted text,bg=background}
+\setbeamercolor*{block title example}{parent=example text,bg=background}
+
+\title{Strings}
+\subtitle{Interview Skills}
+\author{Richard Morrill}
+\institute{Fordham University CS Society}
+\logo{\includegraphics[width=2cm]{Images/css_logo_color.png}}
+\date{Wednesday, Febuary 12th 2020}
+
+\begin{document}
+\begin{frame}
+\titlepage
+\end{frame}
+\begin{frame}
+    \frametitle{General Info}
+    \begin{itemize}
+        \item The questions will be based on C-style strings.
+        \begin{itemize}
+            \item You'll have to deal with them at some point.
+            \item It also means many skills will translate to arrays.
+            \item If you want to use fancy C++ stuff feel free.
+        \end{itemize}
+        \pause
+        \item Make sure you understand the given sample case, and try to come up
+        with your own.
+        \pause
+        \item Go with the simplest solution you can think of, but keep
+        efficiency in the back of your mind.
+    \end{itemize}
+\end{frame}
+\begin{frame}
+    \frametitle{Helpful Hints}
+    \begin{itemize}
+        \item Just an array of \texttt{char}.
+        \item The string variable is really just a pointer to the first character.
+        \item There is a NULL (\texttt{`\char`\\0'}) character at the end of every string.
+        \item Use \texttt{strlen(str)} to find the length (Won't include NULL).
+        \item \texttt{`a' - `a' == 0} and \texttt{`z' - `a' == 25} Use this
+        information wisely.
+        \item Don't bother implementing simple functions such as \texttt{swap(a, b)} or \texttt{max(a,b)}
+        \item C-Strings always pass by reference (pointer).
+    \end{itemize}
+\end{frame}
+\begin{frame}
+    \frametitle{Problem 1: Reverse a String (5 minutes)}
+    Use function signature \code{void reverse(char* str)}.
+
+    \vfill{}
+    Do I really have to spell this one out for you?
+\end{frame}
+\begin{frame}[fragile]
+    \frametitle{Problem 1 solution}
+    \begin{lstlisting}
+void reverse(char* str) {
+    // Why did I store this value in a variable?
+    int n = strlen(str);
+  
+    for (int i = 0; i < n / 2; i++) {
+        swap(str[i], str[n - i - 1]); 
+    }
+} 
+    \end{lstlisting}
+\end{frame}
+\begin{frame}
+    \frametitle{Problem 1.1: Palindrome (2 minutes)}
+    Quick! Take your solution to problem 1 and make it tell me if a string is a palindrome.
+    \vfill{}
+    Examples of Palindromes: racecar tacocat mom
+\end{frame}
+\begin{frame}
+    \frametitle{Problem 2: Longest Common Substring (12 minutes)}
+
+    Given two strings, return the length of the longest common contiguous segment.
+    \vfill{}
+    Examples:
+    \begin{itemize}
+        \item \textcolor{red}{seminar seminar}ian $\rightarrow$ 7
+        \item tho\textcolor{red}{mas} \textcolor{red}{mas}sachusets $\rightarrow$ 3
+        \item abcaf\textcolor{red}{ledt} bbcazt\textcolor{red}{ledt}or $\rightarrow$ 4
+    \end{itemize}
+\end{frame}
+\begin{frame}[fragile]
+    \frametitle{Problem 2 Solution}
+    \begin{lstlisting}[basicstyle=\tiny]
+int LCS(char* x, char* y) { 
+    int xlen = strlen(x);
+    int ylen = strlen(y);
+    
+    int result = 0;
+  
+    for (int xstart = 0; xstart < xlen - 1; ++ xstart) {
+        for (int ystart = 0; ystart < ylen - 1; ++ ystart) {
+            int xi = xstart;
+            int yi = ystart;
+
+            int currLen = 0;
+            while(xi < xlen && yi < ylen && x[xi] == y[yi]) {
+                ++currLen;
+                ++xi;
+                ++yi;
+            }
+
+            if (currLen > result) {
+                result = currLen;
+            }
+        }
+    }
+    return result;
+}
+    \end{lstlisting}
+\end{frame}
+\begin{frame}
+    \frametitle{Follow Up for Problem 2}
+
+    The solution I presented was incredibly inefficient.
+    \vfill{}
+    How could we make this more efficient?
+\end{frame}
+\begin{frame}
+    \frametitle{Problem 3: Most Common Character (8 minutes)}
+
+    Given an input string consisting only of lowercase letters,
+    return the most commonly used character.
+
+\end{frame}
+\begin{frame}[fragile]
+    \frametitle{Problem 3 Solution}
+    \begin{lstlisting}[basicstyle=\tiny]
+char mostCommon(char* str) {
+    int n = strlen(str);
+    int buff[26];
+    buff[0] = 0;
+
+    for (int i = 0; i < n; ++i) {
+        ++buff[str[i] - 'a'];
+    }
+    int max = 0;
+    char maxChar = '\0';
+    for (int i = 0; i < 26; ++i) {
+        if (buff[i] > max) {
+            max = buff[i];
+            maxChar = i + 'a';
+        }
+    }
+    return maxChar;
+} 
+    \end{lstlisting}
+
+\end{frame}
+\begin{frame}
+    \frametitle{Problem 4: Compression (12 minutes)}
+    
+    Given a string of lowercase letters, replace every repeating letter
+    with that letter followed by the number of times it occurred.
+    \vfill{}
+    Examples
+    \begin{itemize}
+        \item aabccc $\rightarrow$ a2bc3
+        \item fffffaaff $\rightarrow$ f5a2f2
+    \end{itemize}
+
+\end{frame}
+\begin{frame}[fragile]
+    \frametitle{Problem 4 Solution}
+    \begin{lstlisting}[basicstyle=\tiny]
+char* compress(char* input) {
+    int inputLen = strlen(input);
+    char* output = new char[inputLen];
+    int outputi = 0;
+
+    char currChar = input[0];
+    int currCharCount = 0;
+    for (int inputi = 0; inputi < inputLen; ++inputi) {
+        if (input[inputi] == currChar) {
+            ++currCharCount;
+        } else {
+            output[outputi] = currChar;
+            ++outputi;
+
+            currChar = input[inputi];
+            if (currCharCount > 1) {
+                output[outputi] = currCharCount + '0';
+                ++outputi;
+            }
+            currCharCount = 1;
+        }
+    }
+    output[outputi] = '\0';
+    return output;
+}
+    \end{lstlisting}
+\end{frame}
+\end{document}
+
